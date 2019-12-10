@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import TextInput from './TextInput.jsx';
+import SelectInput from './SelectInput.jsx';
+import {validate} from '../utils/validate.js';
 
 class FormContainer extends Component {
 
@@ -15,13 +17,26 @@ class FormContainer extends Component {
           minLength: 3
         }
       },
-      name: {
+      firstname: {
         value: '',
-        placeholder: 'Name',
-        valid: true,
+        placeholder: 'Last Name',
+        valid: false,
         touched: false,
         validationRules: {
-          minLength: 3
+          minLength: 3,
+          maxLength: 10,
+          isRequired: true,
+        }
+      },
+      lastname: {
+        value: '',
+        placeholder: 'First Name',
+        valid: false,
+        touched: false,
+        validationRules: {
+          minLength: 3,
+          maxLength: 10,
+          isRequired: true,
         }
       },
       password: {
@@ -32,6 +47,21 @@ class FormContainer extends Component {
         validationRules: {
           minLength: 3
         }
+      },
+      color: {
+        value: '',
+        valid: false,
+        touched: false,
+        validationRules: {
+          isRequired: true,
+        },
+        options: [
+          { value: 'blue', displayValue: 'Blue' },
+          { value: 'yellow', displayValue: 'Yellow' },
+          { value: 'Purple', displayValue: 'Purple' },
+          { value: 'Green', displayValue: 'Green' },
+          { value: 'Pink', displayValue: 'Pink' }
+        ]
       }
 
     }
@@ -47,20 +77,29 @@ class FormContainer extends Component {
     const name = e.target.name;
     const value = e.target.value;
 
+    const updatedControls = {
+      ...this.state.formController
+    };
+
+    const updatedFormElement = {
+      ...updatedControls[name]
+    };
+
+    updatedFormElement.value = value;
+    updatedFormElement.touched = true;
+    updatedFormElement.valid = validate(value, updatedFormElement.validationRules);
+
+    updatedControls[name] = updatedFormElement;
+
     this.setState({
-      formController: {
-        ...this.state.formController,
-        [name]: {
-          ...this.state.formController[name],
-          value
-        }
-      }
+      formController: updatedControls
     })
   }
 
   render() {
 
-    const {formController} = this.state;
+    const { formController } = this.state;
+
     return (
       <div>
 
@@ -73,10 +112,20 @@ class FormContainer extends Component {
               onChange={this.handleChange}
             />
             <TextInput
-              name="name"
-              placeholder="name"
-              value={formController.name.value}
+              name="firstname"
+              placeholder={formController.firstname.placeholder}
+              value={formController.firstname.value}
               onChange={this.handleChange}
+              touched={formController.firstname.touched}
+              valid={formController.firstname.valid}
+            />
+            <TextInput
+              name="lastname"
+              placeholder={formController.lastname.placeholder}
+              value={formController.lastname.value}
+              onChange={this.handleChange}
+              touched={formController.lastname.touched}
+              valid={formController.lastname.valid}
             />
             <input
               type="password"
@@ -85,6 +134,15 @@ class FormContainer extends Component {
               value={formController.password.value}
               onChange={this.handleChange}
             />
+            <SelectInput
+              name="color"
+              value={formController.color.value}
+              onChange={this.handleChange}
+              touched={formController.color.touched}
+              valid={formController.color.valid}
+              options={formController.color.options}
+            />
+
           <button type="submit">Submit</button>
         </form>
 
